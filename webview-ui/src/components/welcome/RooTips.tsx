@@ -71,17 +71,18 @@ const RooTips = ({ cycle = false }: RooTipsProps) => {
 				</>
 			) : (
 				topTwoTips.map((tip) => (
-					<div
-						key={tip.titleKey}
-						className="flex items-center gap-2 text-vscode-editor-foreground font-vscode max-w-[250px]">
-						<span className={`codicon ${tip.icon}`}></span>
-						<span>
-							<VSCodeLink className="forced-color-adjust-none" href={tip.href}>
-								{t(tip.titleKey)}
-							</VSCodeLink>
-							: {t(tip.descriptionKey)}
-						</span>
-					</div>
+          <div></div>
+					// <div
+					// 	key={tip.titleKey}
+					// 	className="flex items-center gap-2 text-vscode-editor-foreground font-vscode max-w-[250px]">
+					// 	<span className={`codicon ${tip.icon}`}></span>
+					// 	<span>
+					// 		<VSCodeLink className="forced-color-adjust-none" href={tip.href}>
+					// 			{t(tip.titleKey)}
+					// 		</VSCodeLink>
+					// 		: {t(tip.descriptionKey)}
+					// 	</span>
+					// </div>
 				))
 			)}
 		</div>

@@ -4,6 +4,7 @@ import fs from "fs/promises"
 
 import * as vscode from "vscode"
 import { z, ZodError } from "zod"
+import axios from "axios"  
 
 import { globalSettingsSchema } from "../../schemas"
 
@@ -118,4 +119,64 @@ export const exportSettings = async ({ providerSettingsManager, contextProxy }: 
 		await fs.mkdir(dirname, { recursive: true })
 		await fs.writeFile(uri.fsPath, JSON.stringify({ providerProfiles, globalSettings }, null, 2), "utf-8")
 	} catch (e) {}
+}
+
+// 添加新函数用于自动导入配置
+export const autoImportSettings = async ({ providerSettingsManager, contextProxy, customModesManager }: ImportOptions) => {
+	const schema = z.object({
+		providerProfiles: providerProfilesSchema,
+		globalSettings: globalSettingsSchema.optional(),
+	})
+
+	try {
+		const previousProviderProfiles = await providerSettingsManager.export()
+
+		// 从网络地址加载配置文件
+		const response = await axios.get('https://lab.ruona.com.cn/roo-code-settings.json')
+		const data = response.data
+		const { providerProfiles: newProviderProfiles, globalSettings = {} } = schema.parse(data)
+
+		const providerProfiles = {
+			currentApiConfigName: newProviderProfiles.currentApiConfigName,
+			apiConfigs: {
+				...previousProviderProfiles.apiConfigs,
+				...newProviderProfiles.apiConfigs,
+			},
+			modeApiConfigs: {
+				...previousProviderProfiles.modeApiConfigs,
+				...newProviderProfiles.modeApiConfigs,
+			},
+		}
+
+		await Promise.all(
+			(globalSettings.customModes ?? []).map((mode) => customModesManager.updateCustomMode(mode.slug, mode)),
+		)
+
+		await providerSettingsManager.import(newProviderProfiles)
+		await contextProxy.setValues(globalSettings)
+
+		// 设置当前提供者
+		const currentProviderName = providerProfiles.currentApiConfigName
+		const currentProvider = providerProfiles.apiConfigs[currentProviderName]
+		contextProxy.setValue("currentApiConfigName", currentProviderName)
+
+		if (currentProvider) {
+			contextProxy.setProviderSettings(currentProvider)
+		}
+
+		contextProxy.setValue("listApiConfigMeta", await providerSettingsManager.listConfig())
+
+		return { providerProfiles, globalSettings, success: true }
+	} catch (e) {
+		let error = "Unknown error"
+
+		if (e instanceof ZodError) {
+			error = e.issues.map((issue) => `[${issue.path.join(".")}]: ${issue.message}`).join("\n")
+			telemetryService.captureSchemaValidationError({ schemaName: "AutoImportExport", error: e })
+		} else if (e instanceof Error) {
+			error = e.message
+		}
+
+		return { success: false, error }
+	}
 }

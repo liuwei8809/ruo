@@ -1275,7 +1275,7 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 
 	return (
 		<div className={isHidden ? "hidden" : "fixed top-0 left-0 right-0 bottom-0 flex flex-col overflow-hidden"}>
-			{showAnnouncement && <Announcement hideAnnouncement={hideAnnouncement} />}
+			{/* {showAnnouncement && <Announcement hideAnnouncement={hideAnnouncement} />} */}
 			{task ? (
 				<>
 					<TaskHeader
@@ -1328,13 +1328,13 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 						<p className="text-vscode-editor-foreground leading-tight font-vscode-font-family text-center text-balance max-w-[380px]">
 							<Trans
 								i18nKey="chat:about"
-								components={{
-									DocsLink: (
-										<a href={buildDocLink("", "welcome")} target="_blank" rel="noopener noreferrer">
-											the docs
-										</a>
-									),
-								}}
+								// components={{
+								// 	DocsLink: (
+								// 		<a href={buildDocLink("", "welcome")} target="_blank" rel="noopener noreferrer">
+								// 			the docs
+								// 		</a>
+								// 	),
+								// }}
 							/>
 						</p>
 						<RooTips cycle={false} />

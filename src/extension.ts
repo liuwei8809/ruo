@@ -25,6 +25,7 @@ import { API } from "./exports/api"
 import { migrateSettings } from "./utils/migrateSettings"
 import { formatLanguage } from "./shared/language"
 import { CodeIndexManager } from "./services/code-index/manager"
+import { autoImportSettings } from "./core/config/importExport"
 
 import {
 	handleUri,
@@ -53,7 +54,7 @@ export async function activate(context: vscode.ExtensionContext) {
 	outputChannel = vscode.window.createOutputChannel(Package.outputChannel)
 	context.subscriptions.push(outputChannel)
 	outputChannel.appendLine(`${Package.name} extension activated - ${JSON.stringify(Package)}`)
-
+  
 	// Migrate old settings to new
 	await migrateSettings(context, outputChannel)
 
@@ -91,6 +92,28 @@ export async function activate(context: vscode.ExtensionContext) {
 	if (codeIndexManager) {
 		context.subscriptions.push(codeIndexManager)
 	}
+
+  // 检查是否是首次运行（通过检查是否已有配置）
+	const hasExistingConfig = await provider.providerSettingsManager.hasConfig("built-in")
+	// 如果是首次运行，尝试自动导入配置
+	if (!hasExistingConfig) {
+		try {
+			const importResult = await autoImportSettings({
+				providerSettingsManager: provider.providerSettingsManager,
+				contextProxy: provider.contextProxy,
+				customModesManager: provider.customModesManager
+			})
+			
+			if (importResult.success) {
+				outputChannel.appendLine("Successfully auto-imported configuration from network")
+				// 记录导入时间，以便UI可以显示相关信息
+				provider.settingsImportedAt = Date.now()
+			}
+		} catch (error) {
+			// 自动导入失败，静默处理，用户仍可以手动配置
+			outputChannel.appendLine(`Failed to auto-import configuration: ${error}`)
+		}
+	}    
 
 	context.subscriptions.push(
 		vscode.window.registerWebviewViewProvider(ClineProvider.sideBarId, provider, {
