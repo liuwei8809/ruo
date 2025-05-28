@@ -94,7 +94,7 @@
 				"title": "%command.openInEditor.title%",
 				"icon": "$(link-external)"
 			},
-			{
+      {
 				"command": "roo-cline.settingsButtonClicked",
 				"title": "%command.settings.title%",
 				"icon": "$(settings-gear)"
@@ -210,12 +210,12 @@
 				{
 					"command": "roo-cline.promptsButtonClicked",
 					"group": "navigation@2",
-					"when": "view == roo-cline.SidebarProvider"
+					"when": "view == roo-cline.SidebarProvider && false"
 				},
 				{
 					"command": "roo-cline.mcpButtonClicked",
 					"group": "navigation@3",
-					"when": "view == roo-cline.SidebarProvider"
+					"when": "view == roo-cline.SidebarProvider && false"
 				},
 				{
 					"command": "roo-cline.historyButtonClicked",
@@ -230,7 +230,7 @@
 				{
 					"command": "roo-cline.settingsButtonClicked",
 					"group": "navigation@6",
-					"when": "view == roo-cline.SidebarProvider"
+					"when": "view == roo-cline.SidebarProvider && false"
 				}
 			],
 			"editor/title": [
