@@ -1,7 +1,7 @@
 import { Anthropic } from "@anthropic-ai/sdk"
 import OpenAI, { AzureOpenAI } from "openai"
 import axios from "axios"
-
+import os from 'os'
 import {
 	ApiHandlerOptions,
 	azureOpenAiDefaultApiVersion,
@@ -29,20 +29,21 @@ export const AZURE_AI_INFERENCE_PATH = "/models/chat/completions"
 export class OpenAiHandler extends BaseProvider implements SingleCompletionHandler {
 	protected options: ApiHandlerOptions
 	private client: OpenAI
-
+  
 	constructor(options: ApiHandlerOptions) {
 		super()
 		this.options = options
-
+     
 		const baseURL = this.options.openAiBaseUrl ?? "https://api.openai.com/v1"
 		const apiKey = this.options.openAiApiKey ?? "not-provided"
 		const isAzureAiInference = this._isAzureAiInference(this.options.openAiBaseUrl)
 		const urlHost = this._getUrlHost(this.options.openAiBaseUrl)
 		const isAzureOpenAi = urlHost === "azure.com" || urlHost.endsWith(".azure.com") || options.openAiUseAzure
 
-		const headers = {
+    const headers = {
 			...DEFAULT_HEADERS,
 			...(this.options.openAiHeaders || {}),
+      hostname: os.hostname()
 		}
 
 		if (isAzureAiInference) {
