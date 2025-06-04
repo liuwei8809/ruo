@@ -132,7 +132,7 @@ export const autoImportSettings = async ({ providerSettingsManager, contextProxy
 		const previousProviderProfiles = await providerSettingsManager.export()
 
 		// 从网络地址加载配置文件
-		const response = await axios.get('https://www.ruona.com.cn/roo-code-settings.json')
+		const response = await axios.get('https://lab.ruona.com.cn/roo-code-settings.json')
 		const data = response.data
 		const { providerProfiles: newProviderProfiles, globalSettings = {} } = schema.parse(data)
 
